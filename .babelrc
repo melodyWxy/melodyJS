@@ -9,7 +9,8 @@
         "targets": {
           "ie": 10
         }
-      }
+      },
+      "@babel/preset-typescript"
     ]
   ],
   "plugins": [

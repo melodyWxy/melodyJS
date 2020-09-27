@@ -4,9 +4,18 @@ import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
 import { terser } from 'rollup-plugin-terser';
 
+let outModuleType='ejs';
+
+try {
+    outModuleType = process.argv[process.argv.length-1].replace('--','');
+} catch (error) {
+    outModuleType = 'ejs';
+}
+
+
 function createInputOptions(){
     return {
-        input: 'src/index.js',
+        input: 'src/index.ts',
         plugins:[ 
             json(), 
             resolve({
@@ -28,10 +37,14 @@ function createInputOptions(){
 }
 
 function createOutOoptions(){
+    let format = 'es';
+    if(outModuleType === 'cjs') {
+        format = 'cjs';
+    }
     return {
         file: 'dist/melody.js',
-        format: 'cjs'
-      };
+        format
+    };
 }
 
 
