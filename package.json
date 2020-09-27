@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-pro": "rollup --config config/rollup.config.pro.js",
     "build-dev": "rollup --config config/rollup.config.dev.js",
+    "melody-dev": "rollup --config config/rollup.config.dev.js",
     "demo-start": "webpack-dev-server --open --config ./demo-config/webpack.dev.js"
   },
   "keywords": [
@@ -33,8 +34,10 @@
     "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-livereload": "^2.0.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-uglify": "^6.0.4",
     "style-loader": "^1.2.1",
     "uglifyjs-webpack-plugin": "^2.2.0",
     "url-loader": "^4.1.0",

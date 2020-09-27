@@ -2,6 +2,7 @@ import json from 'rollup-plugin-json';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
+// import livereload from 'rollup-plugin-livereload';
 
 function createInputOptions(){
     return {
@@ -18,7 +19,8 @@ function createInputOptions(){
             babel({
                 exclude: 'node_modules/**', // 只编译我们的源代码
                 runtimeHelpers: true
-            })
+            }),
+            // livereload()
         ],
         // 指出应将哪些模块视为外部模块
         external: ['lodash']
@@ -29,9 +31,9 @@ function createOutOoptions(){
     return [{
         file: 'dist/melody.js',
         format: 'cjs'
-    },{
-        file: 'demo/dist/melody.js',
-        format: 'iife'
+    // },{
+    //     file: 'demo/dist/melody.js',
+    //     format: 'iife'
     }];
 }
 

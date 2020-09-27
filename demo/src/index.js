@@ -1,2 +1,3 @@
-import Melody from '../dist/melody';
+import Melody from '../../src/index';
+
 console.log(Melody)
