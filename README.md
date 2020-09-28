@@ -6,14 +6,16 @@
 
 npm run demo-start
 
-### 打包输出melody-es模块
+### 打包输出melody-es模块-生产环境
 
 npm run build-es
 
-### 打包输出melody-commonjs模块
+### 打包输出melody-commonjs模块-生产环境
 
 npm run build-cjs
 
+### 打包输出melody-es模块-开发环境
+npm run build-dev
 
 ## 设计思想
 
