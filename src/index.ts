@@ -1,7 +1,7 @@
-import M_Component from './Component'; 
+import M_Component from './Component/index';
 
 const Melody = {
-    a: 2
+    a: 6
 };
 export const Component = M_Component;
 export default Melody;

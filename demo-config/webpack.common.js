@@ -2,29 +2,44 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
-
 module.exports = {
   entry:  {
-    app: './demo/src/index.js'
-  },
-  externals: {	//表示下面的模块不需要打包。
-    'Melody': "Melody"
+    app: path.resolve(__dirname, '../demo/src/index.js')
   },
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      template: './demo/public/index.html',
-      inject:true
+      template: path.resolve(__dirname, '../demo/public/index.html'),
+      inject: true
     }),
   ],
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, './demo/dist')
+    path: path.resolve(__dirname, '../demo/dist')
   },
+  resolve: {
+    extensions:['.js','.ts']
+  },  
   module: {
     rules:[
         {
-            test:/|.(js|jsx)$/,
+          test: /\.(ts|tsx)$/,
+          use: [{
+            loader: 'babel-loader',
+            options: {
+              presets: ['@babel/preset-env']
+            }
+          }, {
+            loader: 'ts-loader',
+              options: {
+                  // 指定特定的ts编译配置，为了区分脚本的ts配置
+                  configFile: path.resolve(__dirname, '../tsconfig.json'),
+              },
+          }],
+          exclude:/node_modules/,
+        },
+        {
+            test:/\.(js|jsx)$/,
             use: {
               loader: 'babel-loader',
               options: {

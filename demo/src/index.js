@@ -1,3 +1,3 @@
 import Melody from '../../src/index';
 
-console.log(Melody)
+console.log(Melody, 1)
