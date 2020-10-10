@@ -9,8 +9,14 @@
         "targets": {
           "ie": 10
         }
-      },
-      "@babel/preset-typescript"
+      }
+    ],
+    "@babel/preset-typescript",
+    [
+      "@babel/preset-react",
+      {
+        "pragma": "Melody.createElement"
+      }
     ]
   ],
   "plugins": [
