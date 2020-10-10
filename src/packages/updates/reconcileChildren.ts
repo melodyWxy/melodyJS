@@ -1,3 +1,4 @@
+
 // diff-diff 协调
 export default function reconcileChildren(wipFiber, elements, deletions) {
     let index = 0;
@@ -46,7 +47,7 @@ export default function reconcileChildren(wipFiber, elements, deletions) {
         // 当最后提交 fiber 树到 DOM 时，我们是从 wipRoot 开始的，
         // 此时没有上一次的 fiber，所以这里用一个数组来跟踪需要
         // 删除的节点
-        deletions.push(oldFiber);
+        deletions && deletions.push(oldFiber);
       }
   
       if (oldFiber) {

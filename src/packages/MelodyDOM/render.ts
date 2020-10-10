@@ -21,18 +21,50 @@ function commitWork(fiber) {
   if (!fiber) {
     return;
   }
-  const domParent = fiber.parent.dom;
+  // 当 fiber 是函数组件时节点不存在 DOM，
+  // 所以需要遍历父节点以找到最近的有 DOM 的节点
+  let domParentFiber = fiber.parent;
+  while (!domParentFiber.dom) {
+    domParentFiber = domParentFiber.parent;
+  }
+  const domParent = domParentFiber.dom;
   // 渲染差异
   if (fiber.effectTag === "PLACEMENT" && fiber.dom != null) {
     domParent.appendChild(fiber.dom);
   } else if (fiber.effectTag === "UPDATE" && fiber.dom != null) {
     updateDom(fiber.dom, fiber.alternate.props, fiber.props);
   } else if (fiber.effectTag === "DELETION") {
-    domParent.removeChild(fiber.dom);
+    commitDeletion(fiber, domParent);
   }
   // 递归渲染差异
   commitWork(fiber.child);
   commitWork(fiber.sibling);
+}
+
+// 移除 DOM 节点
+function commitDeletion(fiber, domParent) {
+  // 当 child 是函数组件时不存在 DOM，
+  // 故需要递归遍历子节点找到真正的 DOM
+  if (fiber.dom) {
+    domParent.removeChild(fiber.dom);
+  } else {
+    commitDeletion(fiber.child, domParent);
+  }
+}
+
+// 处理函数组件
+function updateFunctionComponent(fiber, deletions) {
+  // 执行函数组件得到 children
+  const children = [fiber.type(fiber.props)];
+  reconcileChildren(fiber, children, deletions);
+}
+
+// 处理原生标签
+function updateHostComponent(fiber, deletions) {
+  if (!fiber.dom) {
+    fiber.dom = createDom(fiber);
+  }
+  reconcileChildren(fiber, fiber.props.children, deletions);
 }
 
 
@@ -45,7 +77,7 @@ function workLoop(deadline) {
   let shouldYield = false;
   while (nextUnitOfWork && !shouldYield) {
     // 并发模式1：当引擎遗留时间>1ms的时候，以协调渲染一个fiber节点为单位工作；
-    nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
+    nextUnitOfWork = performUnitOfWork(nextUnitOfWork, deletions);
     shouldYield = deadline.timeRemaining() < 1;
   }
   
@@ -59,15 +91,16 @@ function workLoop(deadline) {
 
 ric.requestIdleCallback(workLoop);
 
-function performUnitOfWork(fiber) {
-  if (!fiber.dom) {
-    fiber.dom = createDom(fiber);
+function performUnitOfWork(fiber, deletions) {
+  const isFunctionComponent = fiber.type instanceof Function;
+  if (isFunctionComponent) {
+    // 函数组件处理
+    console.log(11);
+    updateFunctionComponent(fiber, deletions);
+  } else {
+    // 原生标签处理
+    updateHostComponent(fiber, deletions);
   }
-
-  const elements = fiber.props.children;
-  // reconcileChildren-diff 
-  reconcileChildren(fiber, elements, deletions);
-
   if (fiber.child) {
     return fiber.child;
   }
