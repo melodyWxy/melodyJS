@@ -3,6 +3,8 @@ import MelodyDOM from '../../src/packages/MelodyDOM';
 
 const root = document.querySelector('#root');
 
+const isf = 1
+
 function App(props){
     return (
         <div>
@@ -20,5 +22,5 @@ MelodyDOM.render(
    <div id='shshsh'>
        563937jbs
    </div>
+   {isf && <h2>555 </h2>}
 </App>), root);
-console.log(Melody, 1)
