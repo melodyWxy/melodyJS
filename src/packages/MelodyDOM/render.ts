@@ -54,6 +54,12 @@ function commitDeletion(fiber, domParent) {
 
 // 处理函数组件
 function updateFunctionComponent(fiber, deletions) {
+  // 更新进行中的 fiber 节点
+  wipFiber = fiber;
+  // 重置 hook 索引
+  hookIndex = 0;
+  // hooks 数组类型以支持同一个组件多次调用 `useState`
+  wipFiber.hooks = [];
   // 执行函数组件得到 children
   const children = [fiber.type(fiber.props)];
   reconcileChildren(fiber, children, deletions);
@@ -67,10 +73,17 @@ function updateHostComponent(fiber, deletions) {
   reconcileChildren(fiber, fiber.props.children, deletions);
 }
 
-
+// 下一个协调渲染单位
 let nextUnitOfWork = null;
+// 用来保存上一次渲染的fiber树  - last-render-fiber;
 let currentRoot = null;
+// fiber树，首次渲染时生成树赋值给此变量，首次渲染后赋值给currentRoot记录保存；
 let wipRoot = null;
+// 渲染进行中的fiber 节点
+let wipFiber = null;
+// 当前hook 的索引
+let hookIndex = null;
+// 要删除的节点列表
 let deletions = null;
 
 function workLoop(deadline) {
@@ -91,11 +104,11 @@ function workLoop(deadline) {
 
 ric.requestIdleCallback(workLoop);
 
+// 协调渲染一个fiber节点为单位工作
 function performUnitOfWork(fiber, deletions) {
   const isFunctionComponent = fiber.type instanceof Function;
   if (isFunctionComponent) {
     // 函数组件处理
-    console.log(11);
     updateFunctionComponent(fiber, deletions);
   } else {
     // 原生标签处理
@@ -113,6 +126,48 @@ function performUnitOfWork(fiber, deletions) {
   }
 }
 
+// useState
+
+export function useState(initial) {
+  // alternate 保存了上一次渲染的 fiber 节点
+  const oldHook =
+    wipFiber.alternate &&
+    wipFiber.alternate.hooks &&
+    wipFiber.alternate.hooks[hookIndex];
+  const hook = {
+    // 第一次渲染使用入参，第二次渲染复用前一次的状态
+    state: oldHook ? oldHook.state : initial,
+    // 保存每次 setState 入参的队列
+    queue: []
+  };
+
+  const actions = oldHook ? oldHook.queue : [];
+  actions.forEach(action => {
+    // 根据调用 setState 顺序从前往后生成最新的 state
+    hook.state = action instanceof Function ? action(hook.state) : action;
+  });
+
+  // setState 函数用于更新 state，入参 action
+  // 是新的 state 值或函数返回新的 state
+  const setState = action => {
+    hook.queue.push(action);
+    // 下面这部分代码和 render 函数很像，
+    // 设置新的 wipRoot 和 nextUnitOfWork
+    // 浏览器空闲时即开始重新渲染。
+    wipRoot = {
+      dom: currentRoot.dom,
+      props: currentRoot.props,
+      alternate: currentRoot
+    };
+    nextUnitOfWork = wipRoot;
+    deletions = [];
+  };
+
+  // 保存本次 hook
+  wipFiber.hooks.push(hook);
+  hookIndex++;
+  return [hook.state, setState];
+}
 
 export default function render(element, container) {
   // 初始化根fiber树
